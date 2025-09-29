@@ -15,15 +15,17 @@ void inputWithValidation(T& variable, const std::string& prompt, const std::stri
 int main() {
     int suits, cards, runs;
     inputWithValidation(suits, "Enter number of suits (1-4): ", "Invalid input. Enter 1-4: ", 1, 4);
-    inputWithValidation(cards, "Enter cards per deal: ", "Invalid input. Enter >0: ", 1, 52);
-    inputWithValidation(runs, "Enter number of runs: ", "Invalid input. Enter >0: ", 1, 1000);
+    inputWithValidation(cards, "Enter cards per deal: ", "Invalid input. Enter >0: ", 1, 1000000);
+    inputWithValidation(runs, "Enter number of runs: ", "Invalid input. Enter >0: ", 1, 1000000);
+
     try {
         Simulation sim(suits, cards, runs);
         sim.run();
-        std::cout << "Most frequent card value: " << sim.mostFrequent() << "\n";
+        sim.printStats();
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << "\n";
         return 1;
     }
+
 }
 

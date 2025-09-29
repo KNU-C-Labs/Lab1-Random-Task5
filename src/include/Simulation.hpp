@@ -3,6 +3,7 @@
 
 #include "DeckDealer.hpp"
 #include <map>
+#include <vector>
 
 class Simulation {
 public:

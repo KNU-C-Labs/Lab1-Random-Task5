@@ -13,4 +13,13 @@ std::string Card::toString() const {
 }
 
 Card::Suit Card::getSuit() const { return suit; }
+
 int Card::getValue() const { return value; }
+
+int Card::compare(const Card& other) const {
+    if (value < other.value) return -1;
+    if (value > other.value) return 1;
+    if (suit < other.suit) return -1;
+    if (suit > other.suit) return 1;
+    return 0;
+}

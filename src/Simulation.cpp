@@ -11,48 +11,67 @@ Simulation::Simulation(int s, int c, int r) : suits(s), cardsPerDeal(c), runs(r)
 }
 
 void Simulation::run() {
-    for (int i = 0; i < runs; ++i) {
+    freq.clear();
+
+    for (int run = 0; run < runs; ++run) {
         DeckDealer dealer(suits);
-        dealer.shuffle();
-        for (int j = 0; j < cardsPerDeal; ++j) {
-            Card c = dealer.deal();
-            freq[c.getValue()]++;
+
+        int stackLength = 0;
+        Card prevCard = dealer.deal();
+        stackLength = 1;
+
+        for (int i = 1; i < cardsPerDeal; ++i) {
+            Card currCard = dealer.deal();
+            if (currCard.compare(prevCard) >= 0) {
+                ++stackLength;
+            } else {
+                freq[stackLength]++;
+                stackLength = 1;
+            }
+            prevCard = currCard;
         }
+        freq[stackLength]++;
     }
 }
 
 int Simulation::mostFrequent() const {
-    int best = -1, maxCount = -1;
-    for (auto &kv : freq) {
-        if (kv.second > maxCount || (kv.second == maxCount && kv.first < best)) {
-            best = kv.first;
-            maxCount = kv.second;
+    if (freq.empty()) throw std::runtime_error("No data");
+    int bestLength = -1;
+    int maxCount = -1;
+    for (const auto& [length, count] : freq) {
+        if (count > maxCount) {
+            maxCount = count;
+            bestLength = length;
         }
     }
-    return best;
+    return bestLength;
 }
 
 double Simulation::average() const {
     if (freq.empty()) throw std::runtime_error("No data");
     double sum = 0;
     int total = 0;
-    for (auto &kv : freq) {
-        sum += kv.first * kv.second;
-        total += kv.second;
+    for (const auto& [length, count] : freq) {
+        sum += length * count;
+        total += count;
     }
     return sum / total;
 }
 
 double Simulation::median() const {
     if (freq.empty()) throw std::runtime_error("No data");
-    std::vector<int> sortedValues;
-    for (auto &kv : freq) {
-        sortedValues.insert(sortedValues.end(), kv.second, kv.first);
+    std::vector<int> lengths;
+    for (const auto& [length, count] : freq) {
+        lengths.insert(lengths.end(), count, length);
     }
-    std::sort(sortedValues.begin(), sortedValues.end());
-    size_t n = sortedValues.size();
-    return (n % 2 == 0) ? (sortedValues[n/2 - 1] + sortedValues[n/2]) / 2.0
-                        : sortedValues[n/2];
+    std::sort(lengths.begin(), lengths.end());
+    size_t n = lengths.size();
+    if (n == 0) return 0;
+    if (n % 2 == 1) {
+        return lengths[n / 2];
+    } else {
+        return (lengths[n / 2 - 1] + lengths[n / 2]) / 2.0;
+    }
 }
 
 void Simulation::printStats() const {
@@ -60,13 +79,21 @@ void Simulation::printStats() const {
         std::cout << "No data\n";
         return;
     }
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Most frequent value: " << mostFrequent() << "\n";
-    std::cout << "Average value: " << average() << "\n";
-    std::cout << "Median value: " << median() << "\n";
 
-    std::cout << "Card counts:\n";
-    for (auto &kv : freq) {
-        std::cout << "Value " << kv.first << ": " << kv.second << " times\n";
+    int totalStacks = 0;
+    for (const auto& [length, count] : freq) {
+        totalStacks += count;
     }
+
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "Total stacks: " << totalStacks << "\n";
+    std::cout << "Stack length distribution (length : count, %):\n";
+    for (const auto& [length, count] : freq) {
+        double percent = 100.0 * count / totalStacks;
+        std::cout << "  " << length << " : " << count << ", " << percent << "%\n";
+    }
+
+    std::cout << "Most frequent stack length: " << mostFrequent() << "\n";
+    std::cout << "Average stack length: " << average() << "\n";
+    std::cout << "Median stack length: " << median() << "\n";
 }

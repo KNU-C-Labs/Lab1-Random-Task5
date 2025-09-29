@@ -13,6 +13,9 @@ public:
 private:
     std::vector<Card> deck;
     int index;
+    int suitsCount;
+
+    void buildDeck();
 };
 
 #endif // DECKDEALER_HPP

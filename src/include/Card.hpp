@@ -13,6 +13,8 @@ public:
     Suit getSuit() const;
     int getValue() const;
 
+    int compare(const Card& other) const;
+
 private:
     Suit suit;
     int value;
