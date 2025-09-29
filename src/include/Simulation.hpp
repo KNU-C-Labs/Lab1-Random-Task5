@@ -9,6 +9,9 @@ public:
     Simulation(int suits, int cardsPerDeal, int runs);
     void run();
     int mostFrequent() const;
+    double average() const;
+    double median() const;
+    void printStats() const;
 
 private:
     int suits;
